@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
-#include <iomanip> // Для форматированного вывода
+#include <iomanip>
 
 template <typename T>
 class DoublyLinkedList {
@@ -20,18 +20,14 @@ private:
     size_t size;
 
 public:
-    // Конструкторы
     DoublyLinkedList() : head(nullptr), tail(nullptr), size(0) {}
 
-    DoublyLinkedList(const DoublyLinkedList& other) : head(nullptr), tail(nullptr), size(0) {
-        Node* current = other.head;
-        while (current != nullptr) {
-            push_back(current->data);
-            current = current->next;
+    DoublyLinkedList(std::initializer_list<T> init_list) : head(nullptr), tail(nullptr), size(0) {
+        for (const auto& item : init_list) {
+            push_back(item);
         }
     }
 
-    // Оператор присваивания
     DoublyLinkedList& operator=(const DoublyLinkedList& other) {
         if (this != &other) {
             clear();
@@ -44,19 +40,17 @@ public:
         return *this;
     }
 
-    // Деструктор
     ~DoublyLinkedList() {
         clear();
     }
 
-    // Конструктор перемещения
-    DoublyLinkedList(DoublyLinkedList&& other) noexcept : head(other.head), tail(other.tail), size(other.size) {
+    DoublyLinkedList(DoublyLinkedList&& other) noexcept
+        : head(other.head), tail(other.tail), size(other.size) {
         other.head = nullptr;
         other.tail = nullptr;
         other.size = 0;
     }
 
-    // Оператор перемещающего присваивания
     DoublyLinkedList& operator=(DoublyLinkedList&& other) noexcept {
         if (this != &other) {
             clear();
@@ -70,7 +64,6 @@ public:
         return *this;
     }
 
-    // Инициализация первого элемента
     void init_first(const T& value) {
         if (empty()) {
             head = tail = new Node(value);
@@ -81,7 +74,6 @@ public:
         }
     }
 
-    // Добавление элемента в конец
     void push_back(const T& value) {
         if (empty()) {
             init_first(value);
@@ -95,7 +87,6 @@ public:
         }
     }
 
-    // Добавление элемента в начало
     void push_front(const T& value) {
         if (empty()) {
             init_first(value);
@@ -109,7 +100,6 @@ public:
         }
     }
 
-    // Удаление элемента по значению
     bool remove(const T& value) {
         Node* current = head;
         while (current != nullptr) {
@@ -120,14 +110,12 @@ public:
                 else {
                     head = current->next;
                 }
-
                 if (current->next) {
                     current->next->prev = current->prev;
                 }
                 else {
                     tail = current->prev;
                 }
-
                 delete current;
                 size--;
                 return true;
@@ -137,7 +125,6 @@ public:
         return false;
     }
 
-    // Поиск элемента по значению
     bool contains(const T& value) const {
         Node* current = head;
         while (current != nullptr) {
@@ -149,7 +136,6 @@ public:
         return false;
     }
 
-    // Вывод элементов на экран
     void print() const {
         if (empty()) {
             std::cout << "List is empty.\n";
@@ -165,7 +151,6 @@ public:
         std::cout << "\n";
     }
 
-    // Очистка списка
     void clear() {
         Node* current = head;
         while (current != nullptr) {
@@ -177,17 +162,14 @@ public:
         size = 0;
     }
 
-    // Проверка на пустоту
     bool empty() const {
         return size == 0;
     }
 
-    // Получение размера списка
     size_t get_size() const {
         return size;
     }
 
-    // Доступ к элементам по индексу
     T& operator[](size_t index) {
         if (index >= size) {
             throw std::out_of_range("Index out of range");
@@ -234,10 +216,15 @@ void menu_loop(DoublyLinkedList<T>& list) {
 
     while (true) {
         display_menu();
-        std::cin >> choice;
 
-        // Очистка буфера ввода
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        // Проверка ввода
+        while (!(std::cin >> choice)) {
+            std::cout << "Invalid input. Please enter a number: ";
+            std::cin.clear(); // Очистка состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Игнорирование неверного ввода
+        }
+
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
 
         switch (choice) {
         case 1: {
