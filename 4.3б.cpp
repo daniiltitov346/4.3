@@ -193,6 +193,22 @@ public:
         }
         return current->data;
     }
+
+    // Public iterator-like interface for solving the problem
+    class Iterator {
+        Node* current;
+    public:
+        Iterator(Node* node) : current(node) {}
+        T& operator*() { return current->data; }
+        Iterator& operator++() { current = current->next; return *this; }
+        Iterator& operator--() { current = current->prev; return *this; }
+        bool operator!=(const Iterator& other) const { return current != other.current; }
+    };
+
+    Iterator begin() { return Iterator(head); }
+    Iterator end() { return Iterator(nullptr); }
+    Iterator rbegin() { return Iterator(tail); }
+    Iterator rend() { return Iterator(nullptr); }
 };
 
 void display_menu() {
@@ -209,117 +225,127 @@ void display_menu() {
     std::cout << "Enter your choice: ";
 }
 
-template <typename T>
-void menu_loop(DoublyLinkedList<T>& list) {
+void handle_init_first(DoublyLinkedList<double>& list) {
+    double value;
+    std::cout << "Enter value for first element: ";
+    std::cin >> value;
+    list.init_first(value);
+}
+
+void handle_push_front(DoublyLinkedList<double>& list) {
+    double value;
+    std::cout << "Enter value to add to front: ";
+    std::cin >> value;
+    list.push_front(value);
+}
+
+void handle_push_back(DoublyLinkedList<double>& list) {
+    double value;
+    std::cout << "Enter value to add to back: ";
+    std::cin >> value;
+    list.push_back(value);
+}
+
+void handle_remove(DoublyLinkedList<double>& list) {
+    double value;
+    std::cout << "Enter value to remove: ";
+    std::cin >> value;
+    if (list.remove(value)) {
+        std::cout << "Element removed successfully.\n";
+    }
+    else {
+        std::cout << "Element not found.\n";
+    }
+}
+
+void handle_contains(DoublyLinkedList<double>& list) {
+    double value;
+    std::cout << "Enter value to search: ";
+    std::cin >> value;
+    if (list.contains(value)) {
+        std::cout << "Element found in the list.\n";
+    }
+    else {
+        std::cout << "Element not found.\n";
+    }
+}
+
+void handle_print(const DoublyLinkedList<double>& list) {
+    list.print();
+}
+
+void handle_clear(DoublyLinkedList<double>& list) {
+    list.clear();
+    std::cout << "List cleared.\n";
+}
+
+void solve_problem(DoublyLinkedList<double>& list) {
+    if (list.empty()) {
+        std::cout << "List is empty. Cannot solve the problem.\n";
+        return;
+    }
+
+    size_t size = list.get_size();
+    if (size % 2 != 0) {
+        std::cout << "List size must be even (2n elements). Current size: " << size << "\n";
+        return;
+    }
+
+    int n = size / 2;
+    std::cout << "\nComparing pairs:\n";
+    std::cout << std::setw(10) << "Pair" << std::setw(15) << "Elements" << std::setw(15) << "Min" << "\n";
+    std::cout << "---------------------------------\n";
+
+    auto front = list.begin();
+    auto back = list.rbegin();
+    double max_value = std::min(*front, *back);
+
+    std::cout << std::setw(10) << "1"
+        << std::setw(15) << *front << "," << *back
+        << std::setw(15) << std::min(*front, *back) << "\n";
+
+    for (int i = 1; i < n; ++i) {
+        ++front;
+        --back;
+
+        double current_min = std::min(*front, *back);
+        if (current_min > max_value) {
+            max_value = current_min;
+        }
+        std::cout << std::setw(10) << i + 1
+            << std::setw(15) << *front << "," << *back
+            << std::setw(15) << current_min << "\n";
+    }
+
+    std::cout << "---------------------------------\n";
+    std::cout << "Final result (max of mins): " << max_value << "\n";
+}
+
+void menu_loop(DoublyLinkedList<double>& list) {
     int choice;
-    T value;
 
     while (true) {
         display_menu();
 
-        // Проверка ввода
         while (!(std::cin >> choice)) {
             std::cout << "Invalid input. Please enter a number: ";
-            std::cin.clear(); // Очистка состояния потока
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Игнорирование неверного ввода
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice) {
-        case 1: {
-            std::cout << "Enter value for first element: ";
-            std::cin >> value;
-            list.init_first(value);
-            break;
-        }
-        case 2: {
-            std::cout << "Enter value to add to front: ";
-            std::cin >> value;
-            list.push_front(value);
-            break;
-        }
-        case 3: {
-            std::cout << "Enter value to add to back: ";
-            std::cin >> value;
-            list.push_back(value);
-            break;
-        }
-        case 4: {
-            std::cout << "Enter value to remove: ";
-            std::cin >> value;
-            if (list.remove(value)) {
-                std::cout << "Element removed successfully.\n";
-            }
-            else {
-                std::cout << "Element not found.\n";
-            }
-            break;
-        }
-        case 5: {
-            std::cout << "Enter value to search: ";
-            std::cin >> value;
-            if (list.contains(value)) {
-                std::cout << "Element found in the list.\n";
-            }
-            else {
-                std::cout << "Element not found.\n";
-            }
-            break;
-        }
-        case 6: {
-            list.print();
-            break;
-        }
-        case 7: {
-            list.clear();
-            std::cout << "List cleared.\n";
-            break;
-        }
-        case 8: {
-            if (list.empty()) {
-                std::cout << "List is empty. Cannot solve the problem.\n";
-                break;
-            }
-
-            size_t size = list.get_size();
-            if (size % 2 != 0) {
-                std::cout << "List size must be even (2n elements). Current size: " << size << "\n";
-                break;
-            }
-
-            int n = size / 2;
-            std::cout << "\nComparing pairs:\n";
-            std::cout << std::setw(10) << "Pair" << std::setw(15) << "Elements" << std::setw(15) << "Min" << "\n";
-            std::cout << "---------------------------------\n";
-
-            T max_value = std::min(list[0], list[2 * n - 1]);
-            std::cout << std::setw(10) << "1"
-                << std::setw(15) << list[0] << "," << list[2 * n - 1]
-                << std::setw(15) << std::min(list[0], list[2 * n - 1]) << "\n";
-
-            for (int i = 1; i < n; ++i) {
-                T current_min = std::min(list[i], list[2 * n - 1 - i]);
-                if (current_min > max_value) {
-                    max_value = current_min;
-                }
-                std::cout << std::setw(10) << i + 1
-                    << std::setw(15) << list[i] << "," << list[2 * n - 1 - i]
-                    << std::setw(15) << current_min << "\n";
-            }
-
-            std::cout << "---------------------------------\n";
-            std::cout << "Final result (max of mins): " << max_value << "\n";
-            break;
-        }
-        case 9: {
-            std::cout << "Exiting...\n";
-            return;
-        }
-        default: {
-            std::cout << "Invalid choice. Please try again.\n";
-            break;
-        }
+        case 1: handle_init_first(list); break;
+        case 2: handle_push_front(list); break;
+        case 3: handle_push_back(list); break;
+        case 4: handle_remove(list); break;
+        case 5: handle_contains(list); break;
+        case 6: handle_print(list); break;
+        case 7: handle_clear(list); break;
+        case 8: solve_problem(list); break;
+        case 9: std::cout << "Exiting...\n"; return;
+        default: std::cout << "Invalid choice. Please try again.\n"; break;
         }
     }
 }

@@ -1,8 +1,3 @@
 ﻿  4.3б.cpp
-C:\Users\Huawei\source\repos\4.3б\4.3б\4.3б.cpp(658,19): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-      C:\Users\Huawei\source\repos\4.3б\4.3б\4.3б.cpp(658,19):
-      контекст создания экземпляра шаблона (сначала самый старый)
-          C:\Users\Huawei\source\repos\4.3б\4.3б\4.3б.cpp(698,9):
-          выполняется компиляция ссылки на экземпляр шаблон функции "void menu_loop<double>(DoublyLinkedList<double> &)"
-  
+C:\Users\Huawei\source\repos\4.3б\4.3б\4.3б.cpp(294,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
   4.3б.vcxproj -> C:\Users\Huawei\source\repos\4.3б\x64\Debug\4.3б.exe
